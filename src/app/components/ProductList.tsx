@@ -214,7 +214,7 @@ export default function ProductList() {
       {showColorPanel && (
         <>
           <div
-            className="md:hidden fixed inset-0 bg-black bg-opacity-50 z-40"
+            className="md:hidden fixed inset-0 backdrop-blur-sm z-40"
             onClick={() => setShowColorPanel(false)}
           />
           <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white rounded-t-xl shadow-2xl z-50 p-6">

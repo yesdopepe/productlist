@@ -1,7 +1,7 @@
 'use client';
 
 import { X, Filter } from 'lucide-react';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 interface FilterState {
   minPrice: number | null;
@@ -42,10 +42,25 @@ export default function FilterModal({
   hasActiveFilters,
   productsCount
 }: FilterModalProps) {
+  const [isAnimating, setIsAnimating] = useState(false);
+  const [shouldRender, setShouldRender] = useState(false);
   
   const handleFilterChange = (key: keyof FilterState, value: string | number | null) => {
     setLocalFilters(prev => ({ ...prev, [key]: value }));
   };
+
+  // Handle modal opening animation
+  useEffect(() => {
+    if (showFilters) {
+      setShouldRender(true);
+      // Small delay to ensure DOM is updated before animation starts
+      setTimeout(() => setIsAnimating(true), 10);
+    } else {
+      setIsAnimating(false);
+      // Wait for animation to complete before removing from DOM
+      setTimeout(() => setShouldRender(false), 300);
+    }
+  }, [showFilters]);
 
   // Close modal on escape key
   useEffect(() => {
@@ -88,17 +103,21 @@ export default function FilterModal({
         )}
       </button>
 
-      {/* Modal - No Backdrop */}
-      {showFilters && (
+      {shouldRender && (
         <>
-          {/* Invisible backdrop for closing */}
+          {/* Backdrop with fade animation */}
           <div
-            className="fixed inset-0 z-40"
+            className={`fixed inset-0 z-40 backdrop-blur-sm bg-black/30 transition-opacity duration-300 ${
+              isAnimating ? 'opacity-100' : 'opacity-0'
+            }`}
             onClick={() => setShowFilters(false)}
           />
-          {/* Modal Content */}
+          
+          {/* Modal Content with slide animation */}
           <div
-            className="fixed inset-y-0 right-0 w-full sm:max-w-md bg-white shadow-2xl transform transition-transform duration-300 ease-out flex flex-col z-50"
+            className={`fixed inset-y-0 right-0 w-full sm:max-w-md bg-white shadow-2xl flex flex-col z-50 transition-transform duration-300 ease-out ${
+              isAnimating ? 'translate-x-0' : 'translate-x-full'
+            }`}
             onClick={(e) => e.stopPropagation()}
           >
             {/* Header - Fixed */}
@@ -230,8 +249,6 @@ export default function FilterModal({
                 </div>
                 <p className="text-xs text-gray-500 mt-2">Range: 0.0 - 1.0</p>
               </div>
-
-
 
               {/* Results Summary */}
               <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-lg p-4">
